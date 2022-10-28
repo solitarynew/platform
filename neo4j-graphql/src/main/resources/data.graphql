@@ -1,0 +1,247 @@
+interface Expenditure {
+    _id: ID!
+    money: Float
+    comment: String
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    month: String
+}
+
+type AdministrationExpenditure implements Expenditure {
+    _id: ID!
+    money: Float
+    comment: String
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    month: String
+    detail: String
+}
+
+type SalesExpenditure implements Expenditure {
+    _id: ID!
+    money: Float
+    comment: String
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    month: String
+    detail: String
+    saler: String
+}
+
+type GeneralManagerOfficeExpenditure implements Expenditure {
+    _id: ID!
+    money: Float
+    comment: String
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    month: String
+    detail: String
+}
+
+type BidSecurity {
+    _id: ID!
+    date: String
+    saler: String
+    client: String
+    projectName: String
+    expectWithdrawTime: _Neo4jDateTime
+    payCompany: String
+    receiveCompany: String
+    money: Float
+    comment: String
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    month: String
+    recoveryRecords: [RecoveryRecord] @relation(name: "RECORD_IN", direction: OUT)
+}
+
+# 一次性add多个relation时，不能使用id作为_ID????，和dataFetchingInterceptor有关?
+type RecoveryRecord {
+    _id: ID!
+    time: _Neo4jDateTime
+    money: Float
+    comment: String
+    bidSecurities: [BidSecurity] @relation(name: "RECORD_IN", direction: IN)
+}
+
+interface Cash {
+    _id: ID!
+    money: Float
+    comment: String
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    month: String
+}
+
+type CashExpenditure implements Cash {
+    _id: ID!
+    money: Float
+    comment: String
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    month: String
+}
+
+type CashIncome implements Cash {
+    _id: ID!
+    money: Float
+    comment: String
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    month: String
+}
+
+type AdvancedPayment {
+    id: ID!
+    money: Float
+    comment: String
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    date: String
+    saler: String
+    client: String
+    contacter: String
+    detail: String
+    invoiceNumber: String
+}
+
+type UnconfirmedAmount {
+    _id: ID!
+    serialNumber: String
+    money: Float
+    createAt: _Neo4jDateTime
+    tradeDate: String
+    client: String
+    clientCompany: String
+    company: String
+    saler: String
+    comment: String
+    dlt: Boolean
+    month: String
+    details: [Detail] @relation(name: "DETAIL_IN", direction: OUT)
+}
+
+type Detail {
+    id: ID!
+    accountID: String
+    date: String
+    money: Float
+    unconfirmedAmount: UnconfirmedAmount @relation(name: "DETAIL_IN", direction: IN)
+}
+
+interface Invoice {
+    _id: ID!
+    date: String
+    saler: String
+    accType: String
+    company: String
+    client: String
+    contacter: String
+    invoiceNumber: String
+    product: String
+    payDate: String
+    payMode: String
+    giveMoney: Float
+    comment: String
+    paid: Boolean
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+}
+
+type NormalInvoice implements Invoice {
+    _id: ID!
+    date: String
+    saler: String
+    accType: String
+    company: String
+    client: String
+    contacter: String
+    invoiceNumber: String
+    product: String
+    payDate: String
+    payMode: String
+    giveMoney: Float
+    comment: String
+    paid: Boolean
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    normalMoney: Float
+    totalMoney: Float
+    invoiceDetail: InvoiceDetail @relation(name: "NORMAL_INVOICE_DETAIL", direction: OUT)
+}
+
+type BorrowingInvoice implements Invoice {
+    _id: ID!
+    date: String
+    saler: String
+    accType: String
+    company: String
+    client: String
+    contacter: String
+    invoiceNumber: String
+    product: String
+    payDate: String
+    payMode: String
+    giveMoney: Float
+    comment: String
+    paid: Boolean
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    rentMoney: Float
+    totalMoney: Float
+    invoiceDetail: InvoiceDetail @relation(name: "BORROWING_INVOICE_DETAIL", direction: OUT)
+}
+
+type NormalAndBorrowingInvoice implements Invoice {
+    _id: ID!
+    date: String
+    saler: String
+    accType: String
+    company: String
+    client: String
+    contacter: String
+    invoiceNumber: String
+    product: String
+    payDate: String
+    payMode: String
+    giveMoney: Float
+    comment: String
+    paid: Boolean
+    createAt: _Neo4jDateTime
+    serialNumber: String
+    dlt: Boolean
+    normalMoney: Float
+    rentMoney: Float
+    totalMoney: Float
+    MoneySum: Float
+    normalInvoiceDetail: InvoiceDetail @relation(name: "NORMAL_INVOICE_DETAIL", direction: OUT)
+    borrowingInvoiceDetail: InvoiceDetail @relation(name: "BORROWING_INVOICE_DETAIL", direction: OUT)
+}
+
+type InvoiceDetail {
+    _id: ID!
+    OutgoingMoney: Float
+    invoice: Invoice @relation(direction: IN)
+    storeItemSchemas: [StoreItemSchema] @relation(name: "STORE_ITEM", direction: OUT)
+}
+
+type StoreItemSchema {
+    _id: ID!
+    IngoingNumber: String
+    OutgoingNumber: String
+    OutgoingDate: _Neo4jDateTime
+    Money: Float
+    invoiceDetail: InvoiceDetail @relation(name: "STORE_ITEM", direction: IN)
+}

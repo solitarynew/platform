@@ -21,7 +21,7 @@ import java.util.List;
 @Configuration
 public class GraphQLConfiguration {
 
-    @Value("classpath:neo4j.graphql")
+    @Value("classpath:data.graphql")
     public Resource graphQl;
 
     @Autowired(required = false)
@@ -35,8 +35,8 @@ public class GraphQLConfiguration {
         TypeDefinitionRegistry neo4jTypeDefinitionRegistry = new SchemaParser().parse(schema);
         SchemaBuilder schemaBuilder = new SchemaBuilder(neo4jTypeDefinitionRegistry, new SchemaConfig(
                 new SchemaConfig.CRUDConfig(),
-                new SchemaConfig.CRUDConfig(false, List.of()),
-                false, true, SchemaConfig.InputStyle.INPUT_TYPE, true, false));
+                new SchemaConfig.CRUDConfig(true, List.of()),
+                false, true, SchemaConfig.InputStyle.INPUT_TYPE, true, true));
         schemaBuilder.augmentTypes();
 
         return builder -> builder

@@ -1,0 +1,183 @@
+@startuml model
+
+note as 说明
+origin A(variable==a)
+意思是该类对应的Schema是A，
+且字段variable在数据库中的取值为a
+end note
+
+class 收入{
+}
+
+收入 <|-- 毛利
+
+class 毛利{
+
+}
+毛利 "1" -- "*" 销售支出
+
+class 支出{
+  Number money 费用
+  String comment 备注
+  Date create_at 创建日期
+  String serial_number 编号
+  Boolean dlt 是否修改
+  String month 月份
+}
+
+支出 <|--- 行政管理支出
+支出 <|--- 总经办支出
+支出 <|--- 销售支出
+
+class 投标保证金{
+  String date 日期
+  String saler 销售员
+  String client 投标单位
+  String projectName 项目名称
+  Date expectWithdrawTime 预估收回日期
+  String payCompany 付款单位
+  String receiveCompany 收款单位
+  Number money 费用
+  String comment 备注
+  Date create_at 创建日期
+  String serial_number 编号
+  Boolean dlt 是否修改
+  String month 月份
+  origin BidBondSchema()
+}
+投标保证金 "1" -- "*" 回收记录
+
+class 回收记录{
+  Date time 收回日期
+  Number money 收回款数
+  String comment 备注
+}
+
+class 现金{
+  Number money 金额
+  String comment 备注
+  Date create_at 创建日期
+  String serial_number 编号
+  Boolean dlt 是否修改
+  String month 月份
+}
+
+现金 <|-- 现金支出
+现金 <|-- 现金收入
+
+class 现金支出{
+  origin CashTreasurerSchema(tag==cashflow && detail==expense)
+}
+
+class 现金收入{
+  origin CashTreasurerSchema(tag==cashflow && detail==income)
+}
+
+class 行政管理支出{
+  String detail 开销类别
+  origin CashTreasurerSchema(tag=='admin fee')
+}
+
+class 总经办支出{
+  String detail 用途
+  origin CashTreasurerSchema(tag=='manage fee')
+}
+
+class 销售支出{
+  String detail 开销类别
+  String saler 销售员
+  origin CashTreasurerSchema(tag=='profit)
+}
+
+class 客户{
+}
+
+
+class 预存{
+  Number money 金额
+  String comment 备注
+  Date create_at 创建日期
+  String serial_number 编号
+  Boolean dlt 是否修改
+  String date 日期
+  String saler 销售员
+  String client 客户单位
+  String contacter 客户联络人
+  String detail 收入或者支出
+  String invoice_number 发票号
+}
+
+class 未确认款项{
+  String serial_number 编号
+  Number money 金额
+  Date create_at 创建日期
+  String tradeDate 交易时间
+  String client 客户姓名
+  String clientCompany 客户单位
+  String company 公司名称
+  String saler 销售
+  String comment 备注
+  Boolean dlt
+}
+未确认款项 "1" -- "*" 明细
+
+class 明细{
+  String accountID 发票号
+  String date 日期
+  Number money 金额
+}
+
+class 发票{
+  Date date 开票日期
+  String saler 销售
+  String acc_type 开票类型
+  String company 公司
+  String client 开票单位
+  String contacter 客户姓名
+  String invoice_number 发票号码
+  String product 产品名称
+  // Number total_money 正常开票总金额
+  // Number money_sum 正常及借票总金额
+  Date pay_date 回款日期
+  String pay_mode 回款方式
+  Number give_money 回款金额
+  String comment 备注
+  Boolean paid 是否回款
+  Date create_at
+  String serial_number
+  Boolean dlt
+}
+
+发票 <|-- 正常开票
+发票 <|-- 借票
+发票 <|-- 正常开票加借票
+
+class 正常开票{
+  Number normal_money 正常开票金额 //normal_money=total_money
+}
+正常开票 "1" -- "1" 发票明细
+
+class 借票{
+  Number rent_money 借票金额 //rent_money=total_money
+}
+借票 "1" -- "1" 发票明细
+
+class 正常开票加借票{
+  Number normal_money 正常开票金额 //normal_money=total_money
+  Number rent_money 借票金额 //rent_money=money_sum-total_money
+}
+正常开票加借票 "1" -- "2" 发票明细
+
+class 发票明细{
+  Number outgoing_money 出库总金额
+}
+发票明细 "1" -- "*" StoreItemSchema
+
+class StoreItemSchema{
+  String ingoing_number 入库单号
+  String outgoing_number 出库单号
+  Date outgoing_date 出库日期
+  Number money 金额
+}
+
+@enduml
