@@ -21,7 +21,7 @@ import java.util.List;
 @Configuration
 public class GraphQLConfiguration {
 
-    @Value("classpath:data.graphql")
+    @Value("classpath:test.graphql")
     public Resource graphQl;
 
     @Autowired(required = false)

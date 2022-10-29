@@ -1,0 +1,45 @@
+type Person {
+    name: String
+    age: Int
+    livesIn : Location @relation(name:"LIVES_IN", direction: OUT)
+    livedIn : [Location] @relation(name:"LIVED_IN", direction: OUT)
+    born : Birth
+    died : Death
+    location: _Neo4jPoint
+}
+interface Temporal {
+    date: String
+}
+type Birth implements Temporal @relation(name:"BORN") {
+    from: Person
+    to: Location
+    date: String
+}
+type Death implements Temporal @relation(name:"DIED",from:"who",to:"where") {
+    who: Person
+    where: Location
+    date: String
+}
+interface Location {
+    name: String
+    founded: Person @relation(name:"FOUNDED", direction: IN)
+    sort_Arg: String
+}
+type City implements Location {
+    name: String
+    founded: Person @relation(name:"FOUNDED", direction: IN)
+    sort_Arg: String
+    city_Arg: String
+}
+type Village implements Location {
+    name: String
+    founded: Person @relation(name:"FOUNDED", direction: IN)
+    sort_Arg: String
+    villageArg: String
+}
+# enum _PersonOrdering { name_asc, name_desc, age_asc, age_desc }
+enum E { pi, e }
+type Query {
+    person : [Person]
+    personByName(name:String) : Person
+}

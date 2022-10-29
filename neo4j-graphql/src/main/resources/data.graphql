@@ -138,6 +138,7 @@ type Detail {
     unconfirmedAmount: UnconfirmedAmount @relation(name: "DETAIL_IN", direction: IN)
 }
 
+# 直接查询父类，会报错
 interface Invoice {
     _id: ID!
     date: String
