@@ -1,5 +1,6 @@
 package info.platform.origin;
 
+import org.neo4j.graphql.OptimizedQueryException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +16,7 @@ public class GraphqlController {
     GraphqlService graphqlService;
 
     @RequestMapping(value = "/graphql", method = RequestMethod.POST)
-    public String graphql(String fileName, String query) throws IOException {
+    public String graphql(String fileName, String query) throws IOException, OptimizedQueryException {
         return graphqlService.queryGraphQL(fileName, query);
     }
 }

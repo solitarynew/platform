@@ -7,9 +7,8 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import org.neo4j.graphql.DataFetchingInterceptor;
-import org.neo4j.graphql.SchemaBuilder;
-import org.neo4j.graphql.SchemaConfig;
+import org.apache.logging.log4j.Logger;
+import org.neo4j.graphql.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -22,10 +21,13 @@ import java.util.List;
 @Service
 public class GraphqlService {
 
+    Logger logger = org.apache.logging.log4j.LogManager.getLogger(GraphqlService.class);
+
     @javax.annotation.Resource
     private DataFetchingInterceptor dataFetchingInterceptor;
 
     HashMap<String, GraphQL> graphQLMap = new HashMap<>();
+    HashMap<String, Translator> translatorMap = new HashMap<>();
 
     public GraphQL makeGraphQL(Resource resource) throws IOException {
 
@@ -53,6 +55,7 @@ public class GraphqlService {
 
         SchemaGenerator schemaGenerator = new SchemaGenerator();
         GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(neo4jTypeDefinitionRegistry, runtimeWiringBuilder.build());
+        translatorMap.put(resource.getFilename(), new Translator(graphQLSchema));
 
         GraphQL graphQL = GraphQL.newGraphQL(graphQLSchema).build();
 
@@ -63,11 +66,15 @@ public class GraphqlService {
 
     public GraphQL modifyGraphQL(Resource resource) throws IOException {
         graphQLMap.remove(resource.getFilename());
+        graphQLMap.remove(resource.getFilename());
         return makeGraphQL(resource);
     }
 
-    public String queryGraphQL(String fileName, String query) throws IOException {
+    public String queryGraphQL(String fileName, String query) throws IOException, OptimizedQueryException {
         GraphQL graphQL = makeGraphQL(new ClassPathResource(fileName));
+        Translator translator = translatorMap.get(fileName);
+        logger.log(org.apache.logging.log4j.Level.INFO,
+                "Cypher query: " + translator.translate(query));
         return graphQL.execute(query).getData().toString();
     }
 
