@@ -138,7 +138,7 @@ type Detail {
     unconfirmedAmount: UnconfirmedAmount @relation(name: "DETAIL_IN", direction: IN)
 }
 
-# 直接查询父类，会报错
+# 对于接口类型，必须在查询中声明__typename字段来标识其类型，因为需要通过parameter来传递类型子类的类型名
 interface Invoice {
     _id: ID!
     date: String
