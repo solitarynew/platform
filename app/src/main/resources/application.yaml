@@ -1,0 +1,28 @@
+org :
+  neo4j :
+    driver :
+      uri : bolt://localhost:7687
+      authentication :
+        username : neo4j
+        password : test
+      config :
+        encrypted : false
+database : neo4j
+spring :
+  graphql :
+    schema :
+      printer :
+        enabled : true
+    graphiql :
+      enabled : true
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://127.0.0.1:3306/workflow?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true
+
+
+flowable:
+  #关闭定时任务JOB
+  async-executor-activate: false
+  #  将databaseSchemaUpdate设置为true。当Flowable发现库与数据库表结构不一致时，会自动将数据库表结构升级至新版本。
+  database-schema-update: true
