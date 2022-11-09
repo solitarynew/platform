@@ -1,14 +1,8 @@
-org :
-  neo4j :
-    driver :
-      uri : bolt://localhost:7687
-      authentication :
-        username : neo4j
-        password : test
-      config :
-        encrypted : false
-database : neo4j
 spring :
+  data :
+    neo4j :
+      encrypted : false
+      database : neo4j
   graphql :
     schema :
       printer :
@@ -19,6 +13,11 @@ spring :
     username: root
     password: 123456
     url: jdbc:mysql://127.0.0.1:3306/workflow?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true
+  neo4j:
+    uri:
+    authentication:
+      username: neo4j
+      password: test
 
 
 flowable:

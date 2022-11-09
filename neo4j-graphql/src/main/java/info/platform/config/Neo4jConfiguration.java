@@ -32,7 +32,7 @@ public class Neo4jConfiguration {
     @Bean
     public DataFetchingInterceptor dataFetchingInterceptor(
             Driver driver,
-            @Value("${database}") String database) {
+            @Value("${spring.data.neo4j.database}") String database) {
         return (env, delegate) -> {
             Cypher cypher = delegate.get(env);
             return driver.session(SessionConfig.forDatabase(database)).writeTransaction(tx -> {
