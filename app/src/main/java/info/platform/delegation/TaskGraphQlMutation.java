@@ -1,7 +1,7 @@
 package info.platform.delegation;
 
 import info.platform.origin.GraphqlService;
-import info.platform.tool.SpringContextHolder;
+import info.platform.common.utils.SpringContextHolder;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.el.FixedValue;
 
