@@ -70,12 +70,13 @@ public class GraphqlService {
         return makeGraphQL(resource);
     }
 
-    public String queryGraphQL(String fileName, String query) throws IOException, OptimizedQueryException {
+    public Object queryGraphQL(String fileName, String query) throws IOException, OptimizedQueryException {
         GraphQL graphQL = makeGraphQL(new ClassPathResource(fileName));
         Translator translator = translatorMap.get(fileName);
-        logger.log(org.apache.logging.log4j.Level.INFO,
-                "Cypher query: " + translator.translate(query));
-        return graphQL.execute(query).getData().toString();
+//        logger.log(org.apache.logging.log4j.Level.INFO,
+//                "Cypher query: " + translator.translate(query));
+//                "Cypher query: " + translator.translate(query));
+        return graphQL.execute(query).getData();
     }
 
 }

@@ -17,6 +17,6 @@ public class GraphqlController {
 
     @RequestMapping(value = "/graphql", method = RequestMethod.POST)
     public String graphql(String fileName, String query) throws IOException, OptimizedQueryException {
-        return graphqlService.queryGraphQL(fileName, query);
+        return graphqlService.queryGraphQL(fileName, query).toString();
     }
 }

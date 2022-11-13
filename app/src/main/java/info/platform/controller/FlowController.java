@@ -1,5 +1,6 @@
 package info.platform.controller;
 
+import info.platform.origin.GraphqlService;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.*;
 import org.flowable.engine.repository.Deployment;
@@ -7,14 +8,17 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.task.api.TaskInfo;
+import org.neo4j.graphql.OptimizedQueryException;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +40,9 @@ public class FlowController {
 
     @Resource
     private ProcessEngine processEngine;
+
+    @Resource
+    private GraphqlService graphqlService;
 
     @RequestMapping(value = "/deploy", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public Deployment deploy() {
@@ -78,19 +85,40 @@ public class FlowController {
     }
 
     @RequestMapping(value = "/start", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String start(String deploymentId, Map<String, Object> variables) {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceById(deploymentId, variables);
+    public String start(String deploymentKey, Map<String, Object> variables) {
+        //ProcessInstance processInstance = runtimeService.startProcessInstanceById(deploymentId, variables);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(deploymentKey, variables);
         return processInstance.getId();
     }
 
     @RequestMapping(value = "tasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<String> tasks(String assignee) {
-        return taskService.createTaskQuery().taskAssignee(assignee).list().stream().map(TaskInfo::getId).collect(java.util.stream.Collectors.toList());
+    public Map<String, Map<String, Object>> tasks(String assignee) {
+        List<String> Ids = taskService.createTaskQuery().taskAssignee(assignee).list().stream().map(TaskInfo::getId).collect(java.util.stream.Collectors.toList());
+        HashMap<String, Map<String, Object>> map = new HashMap<>();
+        Ids.forEach(id -> {
+            Map<String, Object> task = taskService.getVariables(id);
+            map.put(id, task);
+        });
+        return map;
     }
 
+
+    // 事务
     @RequestMapping(value = "complete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void complete(String taskId, Map<String, Object> variables) {
-        taskService.complete(taskId, variables);
+    public void complete(@RequestBody Map<String, Object> variables) {
+        if (variables.containsKey("graphql")) {
+            try {
+                Object result = graphqlService.queryGraphQL(
+                        variables.get("fileName").toString(),
+                        variables.get("graphql").toString()
+                );
+                taskService.setVariables(variables.get("taskId").toString(), Map.of("result", result));
+
+            } catch (IOException | OptimizedQueryException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        taskService.complete(variables.get("taskId").toString(), variables);
     }
 
 

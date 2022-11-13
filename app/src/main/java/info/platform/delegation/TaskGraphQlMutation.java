@@ -5,16 +5,14 @@ import info.platform.tool.SpringContextHolder;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.el.FixedValue;
 import org.neo4j.graphql.OptimizedQueryException;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
 public class TaskGraphQlMutation implements TaskListener {
 
-    private FixedValue fileName = new FixedValue("schema.graphql");
+    private FixedValue fileName;
 
-    private FixedValue graphql = new FixedValue("mutation {   createNormalInvoice(comment: \"普通发票24\") {     _id     comment   } }");
+    private FixedValue graphql;
 
     @Override
     public void notify(org.flowable.task.service.delegate.DelegateTask delegateTask) {
@@ -27,5 +25,21 @@ public class TaskGraphQlMutation implements TaskListener {
         } catch (IOException | OptimizedQueryException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public FixedValue getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(FixedValue fileName) {
+        this.fileName = fileName;
+    }
+
+    public FixedValue getGraphql() {
+        return graphql;
+    }
+
+    public void setGraphql(FixedValue graphql) {
+        this.graphql = graphql;
     }
 }

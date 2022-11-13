@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:activiti="http://activiti.org/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="diagram_process_1667737476222" targetNamespace="http://activiti.org/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
   <bpmn2:process id="process_1667737476222" name="流程kkkkk" isExecutable="true">
-    <bpmn2:userTask id="Activity_1wfcnsg" name="填写普通发票" activiti:assignee="1">
+    <bpmn2:userTask id="Activity_1wfcnsg" name="填写普通发票" activiti:formKey="" activiti:assignee="1">
       <bpmn2:extensionElements>
-        <activiti:taskListener class="info.platform.delegation.TaskGraphQlMutation" event="complete">
-          <activiti:field name="fileName" string="data.graphql" />
-          <activiti:field name="graphql" string="mutation {   createNormalInvoice(comment: &#34;普通发票24&#34;) {     _id     comment   } }" />
-        </activiti:taskListener>
+        <activiti:inputOutput>
+          <activiti:inputParameter name="21323">3123123</activiti:inputParameter>
+          <activiti:outputParameter name="execution">
+            <activiti:map>
+              <activiti:entry key="FileName">data.graphql</activiti:entry>
+              <activiti:entry key="graphql">mutation {   createNormalInvoice(comment:  普通发票24) {     _id     comment   } }</activiti:entry>
+            </activiti:map>
+          </activiti:outputParameter>
+        </activiti:inputOutput>
       </bpmn2:extensionElements>
       <bpmn2:incoming>Flow_1ilqnu4</bpmn2:incoming>
       <bpmn2:outgoing>Flow_1h5gmln</bpmn2:outgoing>
