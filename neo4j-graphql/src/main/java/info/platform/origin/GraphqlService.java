@@ -1,5 +1,6 @@
 package info.platform.origin;
 
+import graphql.ExecutionInput;
 import graphql.GraphQL;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLSchema;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GraphqlService {
@@ -70,13 +72,18 @@ public class GraphqlService {
         return makeGraphQL(resource);
     }
 
-    public Object queryGraphQL(String fileName, String query) throws IOException, OptimizedQueryException {
+    public Object queryGraphQL(String fileName, String query, Map<String, Object> variables) throws IOException, OptimizedQueryException {
         GraphQL graphQL = makeGraphQL(new ClassPathResource(fileName));
         Translator translator = translatorMap.get(fileName);
 //        logger.log(org.apache.logging.log4j.Level.INFO,
 //                "Cypher query: " + translator.translate(query));
 //                "Cypher query: " + translator.translate(query));
-        return graphQL.execute(query).getData();
+        return graphQL
+                .execute(ExecutionInput.newExecutionInput()
+                        .query(query)
+                        .variables(variables)
+                        .build())
+                .getData();
     }
 
 }

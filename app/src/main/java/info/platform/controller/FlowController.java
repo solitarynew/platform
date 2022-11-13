@@ -110,7 +110,8 @@ public class FlowController {
             try {
                 Object result = graphqlService.queryGraphQL(
                         variables.get("fileName").toString(),
-                        variables.get("graphql").toString()
+                        variables.get("graphql").toString(),
+                        null
                 );
                 taskService.setVariables(variables.get("taskId").toString(), Map.of("result", result));
 

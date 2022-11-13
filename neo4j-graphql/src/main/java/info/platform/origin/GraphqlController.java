@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/origin")
@@ -16,7 +17,7 @@ public class GraphqlController {
     GraphqlService graphqlService;
 
     @RequestMapping(value = "/graphql", method = RequestMethod.POST)
-    public String graphql(String fileName, String query) throws IOException, OptimizedQueryException {
-        return graphqlService.queryGraphQL(fileName, query).toString();
+    public String graphql(String fileName, String query, Map<String, Object> variables) throws IOException, OptimizedQueryException {
+        return graphqlService.queryGraphQL(fileName, query, variables).toString();
     }
 }
