@@ -56,6 +56,19 @@ declare namespace API {
     success?: boolean;
   };
 
+  type TaskListItem = {
+    id?: string;
+    name?: string;
+    description?: string;
+  }
+
+  type TaskList = {
+    data?: TaskListItem[];
+    /** 列表的内容总数 */
+    total?: number;
+    success?: boolean;
+  }
+
   type FakeCaptcha = {
     code?: number;
     status?: string;

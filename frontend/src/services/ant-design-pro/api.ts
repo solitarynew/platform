@@ -83,3 +83,23 @@ export async function removeRule(options?: { [key: string]: any }) {
     ...(options || {}),
   });
 }
+
+/** 获取任务列表 GET /api/task */
+export async function task(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.TaskList>('/api/task', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}

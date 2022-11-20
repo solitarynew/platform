@@ -14,6 +14,12 @@
     ],
   },
   {
+    path: '/new-page',
+    name: 'new-page',
+    icon: 'smile',
+    component: './Welcome',
+  },
+  {
     path: '/welcome',
     name: 'welcome',
     icon: 'smile',
@@ -41,6 +47,12 @@
     icon: 'table',
     path: '/list',
     component: './TableList',
+  },
+  {
+    name: 'list.task-list',
+    icon: 'table',
+    path: '/task-list',
+    component: './TaskList',
   },
   {
     path: '/',
