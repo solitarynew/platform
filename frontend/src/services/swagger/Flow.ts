@@ -25,12 +25,57 @@ export async function deployUsingPOST(options?: { [key: string]: any }) {
   });
 }
 
+/** form POST /api/flow/form */
+export async function formUsingPOST(
+  body: API.FlowTaskFormRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.ResponseDataFlowTaskFormResponse>('/api/flow/form', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** formInfo POST /api/flow/form/info */
+export async function formInfoUsingPOST(
+  body: API.FlowTaskFormInfoRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.ResponseDataMapstringobject>('/api/flow/form/info', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** Flow Picture By TaskId POST /api/flow/pic */
 export async function showPicByTaskIdUsingPOST(
   body: API.FlowPicByTaskId,
   options?: { [key: string]: any },
 ) {
   return request<API.ResponseDataFlowPicByTaskIdResponse>('/api/flow/pic', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** save POST /api/flow/save */
+export async function saveUsingPOST(
+  body: API.FlowTaskFormSaveRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.ResponseDataboolean>('/api/flow/save', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

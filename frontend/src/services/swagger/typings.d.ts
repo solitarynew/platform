@@ -45,6 +45,25 @@ declare namespace API {
     variables?: Record<string, any>;
   };
 
+  type FlowTaskFormInfoRequest = {
+    taskId?: string;
+  };
+
+  type FlowTaskFormRequest = {
+    taskId?: string;
+  };
+
+  type FlowTaskFormResponse = {
+    formSchema?: string;
+    mutationGraphql?: string;
+    queryGraphql?: string;
+  };
+
+  type FlowTaskFormSaveRequest = {
+    taskId?: string;
+    variables?: Record<string, any>;
+  };
+
   type ResponseDataArrayTaskPageResponse = {
     data?: TaskPageResponse[];
     errorCode?: number;
@@ -68,6 +87,20 @@ declare namespace API {
 
   type ResponseDataFlowStartResponse = {
     data?: FlowStartResponse;
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type ResponseDataFlowTaskFormResponse = {
+    data?: FlowTaskFormResponse;
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type ResponseDataMapstringobject = {
+    data?: Record<string, any>;
     errorCode?: number;
     errorMessage?: string;
     success?: boolean;
