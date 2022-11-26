@@ -1,13 +1,111 @@
 import React, {useRef, useState} from "react";
 import {FormattedMessage, useIntl} from "@@/plugin-locale/localeExports";
-import {
+import type {
   ActionType,
-  PageContainer, ProColumns,
-  ProDescriptions, ProDescriptionsItemProps,
+  ProColumns,
+  ProDescriptionsItemProps, ProFormColumnsType
+} from '@ant-design/pro-components';
+import {
+  BetaSchemaForm,
+  PageContainer,
+  ProDescriptions,
   ProTable,
 } from '@ant-design/pro-components';
-import {Drawer} from "antd";
-import {task} from "@/services/ant-design-pro/api";
+import {Button, Col, Divider, Drawer, Image, message, Row} from "antd";
+import {showPicByTaskIdUsingPOST, tasksUsingPOST, completeUsingPOST} from "@/services/swagger/Flow"
+import {ExclamationCircleFilled} from "@ant-design/icons";
+import confirm from "antd/es/modal/confirm";
+
+/**
+ * @zh-US Get Picture of the flow instance by taskId
+ * @zh-CN 根据taskId获取对应的流程实例的状态图
+ *
+ * @param fields
+ */
+const getPicUrlByTaskId = async (fields: API.TaskPageResponse) => {
+  try {
+    const resp: API.ResponseDataFlowPicByTaskIdResponse = await showPicByTaskIdUsingPOST({"taskId": fields.id});
+    // string to blob
+    // const blob = new Blob([resp.data?.pic || ""], {type: "image/png"});
+    // const url = window.URL.createObjectURL(blob);
+    // return url;
+    return resp.data?.pic;
+  } catch (error) {
+    message.error('Failed to get the picture of the flow instance');
+    return "";
+  }
+}
+
+/**
+ * @en-US Complete the task
+ * @zh-CN 完成任务
+ * @param taskId
+ */
+const complete = async (taskId: string) => {
+  const hide = message.loading('正在完成');
+  try {
+    await completeUsingPOST({ taskId });
+    hide();
+    message.success('成功，即将刷新');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('失败，请重试');
+    return false;
+  }
+};
+
+const valueEnum = {
+  all: { text: '全部', status: 'Default' },
+  open: {
+    text: '未解决',
+    status: 'Error',
+  },
+  closed: {
+    text: '已解决',
+    status: 'Success',
+    disabled: true,
+  },
+  processing: {
+    text: '解决中',
+    status: 'Processing',
+  },
+};
+
+type DataItem = {
+};
+
+const jsonscheme: ProFormColumnsType<DataItem>[] = [
+  {
+    title: '标题',
+    dataIndex: 'title',
+    formItemProps: {
+      rules: [
+        {
+          required: true,
+          message: '此项为必填项',
+        },
+      ],
+    },
+    width: 'md',
+    colProps: {
+      xs: 24,
+      md: 12,
+    },
+    initialValue: '默认值'
+  },
+  {
+    title: '状态',
+    dataIndex: 'state',
+    valueType: 'select',
+    valueEnum,
+    width: 'md',
+    colProps: {
+      xs: 24,
+      md: 12,
+    },
+  }
+  ];
 
 const TaskList: React.FC = () => {
   /**
@@ -19,9 +117,10 @@ const TaskList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
+  const [currentRow, setCurrentRow] = useState<API.TaskPageResponse>();
+  const [currentPic, setCurrentPic] = useState<string>("");
 
-  const columns: ProColumns<API.RuleListItem>[] = [
+  const columns: ProColumns<API.TaskPageResponse>[] = [
     {
       title: (
         <FormattedMessage
@@ -34,9 +133,10 @@ const TaskList: React.FC = () => {
       render: (dom, entity) => {
         return (
           <a
-            onClick={() => {
+            onClick={async () => {
               setCurrentRow(entity);
               setShowDetail(true);
+              setCurrentPic(await getPicUrlByTaskId(entity) || "");
             }}
           >
             {dom}
@@ -58,7 +158,7 @@ const TaskList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.TaskListItem, API.PageParams>
+      <ProTable<API.TaskPageResponse, API.TaskPageRequest>
         headerTitle={intl.formatMessage({
           id: 'pages.taskList.title',
           defaultMessage: 'My Task List',
@@ -68,7 +168,7 @@ const TaskList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        request={task}
+        request={tasksUsingPOST}
         columns={columns}
       />
       <Drawer
@@ -93,6 +193,52 @@ const TaskList: React.FC = () => {
             columns={columns as ProDescriptionsItemProps<API.TaskListItem>[]}
           />
         )}
+        <Divider />
+        <Image src={"data:image/png;base64," + currentPic} />
+        <Divider />
+        <BetaSchemaForm<DataItem>
+          trigger={<a>填写表单</a>}
+          layoutType={'ModalForm'}
+          steps={[
+            {
+              title: 'ProComponent',
+            },
+          ]}
+          rowProps={{
+            gutter: [16, 16],
+          }}
+          colProps={{
+            span: 12,
+          }}
+          grid={true}
+          onFinish={async (values) => {
+            console.log(values);
+          }}
+          columns={jsonscheme}
+        />
+        <Divider />
+        <Row>
+          <Col span={12}>
+            <Button type="primary" onClick={
+              () => {
+                confirm({
+                  title: 'Do you want to complete this task?',
+                  icon: <ExclamationCircleFilled/>,
+                  content: 'Once completed, the task will be removed from the task list',
+                  okText: 'Yes',
+                  cancelText: 'No',
+                  onOk: async () => {
+                    await complete(currentRow?.id || "");
+                    actionRef.current?.reload();
+                  }
+                });
+              }
+            }>同意</Button>
+          </Col>
+          <Col span={12}>
+            <Button type="primary" danger>拒绝</Button>
+          </Col>
+        </Row>
       </Drawer>
     </PageContainer>
   );

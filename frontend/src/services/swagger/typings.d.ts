@@ -1,52 +1,91 @@
-// @ts-ignore
-/* eslint-disable */
-
 declare namespace API {
-  type Order = {
-    id?: number;
-    petId?: number;
-    quantity?: number;
-    shipDate?: string;
-    /** Order Status */
-    status?: 'placed' | 'approved' | 'delivered';
-    complete?: boolean;
+  type Deployment = {
+    category?: string;
+    deploymentTime?: string;
+    derivedFrom?: string;
+    derivedFromRoot?: string;
+    engineVersion?: string;
+    id?: string;
+    key?: string;
+    name?: string;
+    new?: boolean;
+    resources?: Record<string, any>;
+    tenantId?: string;
   };
 
-  type Category = {
-    id?: number;
+  type EngineResource = {
+    bytes?: string;
+    deploymentId?: string;
+    generated?: boolean;
     name?: string;
   };
 
-  type User = {
-    id?: number;
-    username?: string;
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    password?: string;
-    phone?: string;
-    /** User Status */
-    userStatus?: number;
+  type FlowPicByTaskId = {
+    taskId?: string;
   };
 
-  type Tag = {
-    id?: number;
+  type FlowPicByTaskIdResponse = {
+    pic?: string;
+  };
+
+  type FlowStartRequest = {
+    deploymentKey?: string;
+    variables?: Record<string, any>;
+  };
+
+  type FlowStartResponse = {
+    processDefinitionId?: string;
+    processDefinitionKey?: string;
+    processDefinitionName?: string;
+    processInstanceId?: string;
+  };
+
+  type FlowTaskCompleteRequest = {
+    taskId?: string;
+    variables?: Record<string, any>;
+  };
+
+  type ResponseDataArrayTaskPageResponse = {
+    data?: TaskPageResponse[];
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type ResponseDataboolean = {
+    data?: boolean;
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type ResponseDataFlowPicByTaskIdResponse = {
+    data?: FlowPicByTaskIdResponse;
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type ResponseDataFlowStartResponse = {
+    data?: FlowStartResponse;
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type TaskPageRequest = {
+    assignee?: string;
+    /** 页码，从 1 开始 */
+    current?: number;
+    /** 每页条数，最大值为 100 */
+    pageSize?: number;
+  };
+
+  type TaskPageResponse = {
+    description?: string;
+    id?: string;
     name?: string;
-  };
-
-  type Pet = {
-    id?: number;
-    category?: Category;
-    name: string;
-    photoUrls: string[];
-    tags?: Tag[];
-    /** pet status in the store */
-    status?: 'available' | 'pending' | 'sold';
-  };
-
-  type ApiResponse = {
-    code?: number;
-    type?: string;
-    message?: string;
+    processInstanceId?: string;
+    variables?: Record<string, any>;
   };
 }
