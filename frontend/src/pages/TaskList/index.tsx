@@ -3,7 +3,7 @@ import {FormattedMessage, useIntl} from "@@/plugin-locale/localeExports";
 import type {
   ActionType,
   ProColumns,
-  ProDescriptionsItemProps, ProFormColumnsType
+  ProDescriptionsItemProps
 } from '@ant-design/pro-components';
 import {
   BetaSchemaForm,
@@ -191,7 +191,7 @@ const TaskList: React.FC = () => {
             params={{taskId: currentRow?.id}}
             request={async () => {const resp = await formInfoUsingPOST({taskId: currentRow?.id});
               console.log(resp);
-              return resp.data}}
+              return resp.data || {};}}
             grid={true}
             onFinish={async (values) => {
               try {

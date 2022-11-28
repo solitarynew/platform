@@ -55,6 +55,13 @@
     component: './TaskList',
   },
   {
+    name: 'list.form-list',
+    icon: 'table',
+    path: '/form-list',
+    component: './FormList',
+  }
+  ,
+  {
     path: '/',
     redirect: '/welcome',
   },
