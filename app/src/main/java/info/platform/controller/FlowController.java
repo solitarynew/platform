@@ -132,20 +132,15 @@ public class FlowController {
     // 事务
     @RequestMapping(value = "complete", method = RequestMethod.POST)
     public ResponseData<Boolean> complete(@RequestBody FlowTaskCompleteReqVO req) {
-        if (req.getVariables() != null && req.getVariables().containsKey("graphql")) {
-            try {
-                Object result = graphqlService.queryGraphQL(
-                        req.getVariables().get("fileName").toString(),
-                        req.getVariables().get("graphql").toString(),
-                        null
-                );
-                taskService.setVariables(req.getVariables().get("taskId").toString(), Map.of("result", result));
-
-            } catch (IOException | OptimizedQueryException e) {
-                throw new RuntimeException(e);
-            }
-        }
         try {
+            String mutationQuery = "mutation($commment: String, $company: String) {\n" +
+                    "  createNormalInvoice(comment: $commment, company: $company) {\n" +
+                    "    _id\n" +
+                    "  }\n" +
+                    "}\n";
+            Map<String, Object> variables = taskService.getVariablesLocal(req.getTaskId());
+            Object o = graphqlService.queryGraphQL("data.graphql", mutationQuery, variables);
+            taskService.setVariables(req.getTaskId(), (Map<String, ? extends Object>) o);
             taskService.complete(req.getTaskId(), req.getVariables());
             return ResponseData.success(true);
         } catch (Exception e) {
@@ -173,13 +168,14 @@ public class FlowController {
     public ResponseData<Boolean> save(@RequestBody FlowTaskFormSaveReqVO req) throws OptimizedQueryException, IOException {
         String taskId = req.getTaskId();
         // 从taskId中或取出mutationGraphql
-        String mutationGraphql = "mutation($comment: String, $company: String) {\n" +
-                "  createNormalInvoice(comment: $comment, company: $company) {\n" +
-                "    _id\n" +
-                "  }\n" +
-                "}\n";
-        Object o = graphqlService.queryGraphQL("data.graphql", mutationGraphql, req.getVariables());
-        taskService.setVariables(taskId, (Map<String, ? extends Object>) o);
+//        String mutationGraphql = "mutation($comment: String, $company: String) {\n" +
+//                "  createNormalInvoice(comment: $comment, company: $company) {\n" +
+//                "    _id\n" +
+//                "  }\n" +
+//                "}\n";
+        //Object o = graphqlService.queryGraphQL("data.graphql", mutationGraphql, req.getVariables());
+        //taskService.setVariables(taskId, (Map<String, ? extends Object>) o);
+        taskService.setVariablesLocal(taskId, req.getVariables());
         return ResponseData.success(true);
     }
 
@@ -187,17 +183,18 @@ public class FlowController {
     public ResponseData<Map<String, Object>> formInfo(@RequestBody FlowTaskFormInfoReqVO req) throws OptimizedQueryException, IOException {
         String taskId = req.getTaskId();
         // 从taskId中或取出queryGraphql
-        String queryGraphql = "query($m: ID){\n" +
-                "  normalInvoices(where: {_id: $m} ) {\n" +
-                "    _id\n" +
-                "    company\n" +
-                "    comment\n" +
-                "  }\n" +
-                "}";
-        Map<String, Object> o = (Map<String, Object>) graphqlService.queryGraphQL("data.graphql", queryGraphql, new HashMap<String, Object>() {{
-            put("m", "3");
-        }});
-        return ResponseData.success((Map<String, Object>) ((List)o.get("normalInvoices")).get(0));
+//        String queryGraphql = "query($m: ID){\n" +
+//                "  normalInvoices(where: {_id: $m} ) {\n" +
+//                "    _id\n" +
+//                "    company\n" +
+//                "    comment\n" +
+//                "  }\n" +
+//                "}";
+//        Map<String, Object> o = (Map<String, Object>) graphqlService.queryGraphQL("data.graphql", queryGraphql, new HashMap<String, Object>() {{
+//            put("m", "3");
+//        }});
+//        return ResponseData.success((Map<String, Object>) ((List)o.get("normalInvoices")).get(0));
+        return ResponseData.success(taskService.getVariablesLocal(taskId));
     }
 
 }
