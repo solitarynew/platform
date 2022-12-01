@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @ApiModel("Flow Task Form Response")
 public class FlowTaskFormRespVO {
-    String formSchema;
-    String queryGraphql;
-    String mutationGraphql;
+    String querySchema;
+    String mutationSchema;
 }

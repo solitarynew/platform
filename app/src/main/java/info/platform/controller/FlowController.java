@@ -2,6 +2,7 @@ package info.platform.controller;
 
 import info.platform.common.result.ResponseData;
 import info.platform.common.utils.BeanUtils;
+import info.platform.common.utils.NestObjectParser;
 import info.platform.controller.vo.*;
 import info.platform.origin.GraphqlService;
 import io.swagger.annotations.Api;
@@ -135,7 +136,7 @@ public class FlowController {
         try {
             String mutationQuery = "mutation($commment: String, $company: String) {\n" +
                     "  createNormalInvoice(comment: $commment, company: $company) {\n" +
-                    "    _id\n" +
+                    "    id: _id\n" +
                     "  }\n" +
                     "}\n";
             Map<String, Object> variables = taskService.getVariablesLocal(req.getTaskId());
@@ -153,28 +154,15 @@ public class FlowController {
     public ResponseData<FlowTaskFormRespVO> form(@RequestBody FlowTaskFormReqVO req) {
         String taskId = req.getTaskId();
         String TaskDefinitionKey = taskService.createTaskQuery().taskId(taskId).singleResult().getTaskDefinitionKey();
-        String defaultschema = "[{\"title\":\"备注\",\"dataIndex\":\"comment\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}},{\"title\":\"公司\",\"dataIndex\":\"company\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}}]";
         FlowTaskFormRespVO vo = new FlowTaskFormRespVO();
-        vo.setFormSchema(defaultschema);
-        vo.setMutationGraphql("mutation($commment: String, $company: String) {\n" +
-                "  createNormalInvoice(comment: $commment, company: $company) {\n" +
-                "    _id\n" +
-                "  }\n" +
-                "}\n");
+        vo.setQuerySchema("[{\"title\":\"备注\",\"dataIndex\":\"comment\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}},{\"title\":\"公司\",\"dataIndex\":\"company\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}}]");
+        vo.setMutationSchema("[{\"title\":\"备注\",\"dataIndex\":\"comment\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}},{\"title\":\"公司\",\"dataIndex\":\"company\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}}]");
         return ResponseData.success(vo);
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public ResponseData<Boolean> save(@RequestBody FlowTaskFormSaveReqVO req) throws OptimizedQueryException, IOException {
         String taskId = req.getTaskId();
-        // 从taskId中或取出mutationGraphql
-//        String mutationGraphql = "mutation($comment: String, $company: String) {\n" +
-//                "  createNormalInvoice(comment: $comment, company: $company) {\n" +
-//                "    _id\n" +
-//                "  }\n" +
-//                "}\n";
-        //Object o = graphqlService.queryGraphQL("data.graphql", mutationGraphql, req.getVariables());
-        //taskService.setVariables(taskId, (Map<String, ? extends Object>) o);
         taskService.setVariablesLocal(taskId, req.getVariables());
         return ResponseData.success(true);
     }
@@ -182,19 +170,23 @@ public class FlowController {
     @RequestMapping(value = "/form/info", method = RequestMethod.POST)
     public ResponseData<Map<String, Object>> formInfo(@RequestBody FlowTaskFormInfoReqVO req) throws OptimizedQueryException, IOException {
         String taskId = req.getTaskId();
-        // 从taskId中或取出queryGraphql
-//        String queryGraphql = "query($m: ID){\n" +
-//                "  normalInvoices(where: {_id: $m} ) {\n" +
-//                "    _id\n" +
-//                "    company\n" +
-//                "    comment\n" +
-//                "  }\n" +
-//                "}";
-//        Map<String, Object> o = (Map<String, Object>) graphqlService.queryGraphQL("data.graphql", queryGraphql, new HashMap<String, Object>() {{
-//            put("m", "3");
-//        }});
-//        return ResponseData.success((Map<String, Object>) ((List)o.get("normalInvoices")).get(0));
         return ResponseData.success(taskService.getVariablesLocal(taskId));
+    }
+
+    @RequestMapping(value = "/form/query", method = RequestMethod.POST)
+    public ResponseData<Map<String, Object>> formQuery(@RequestBody FlowTaskFormQueryReqVO req) throws OptimizedQueryException, IOException {
+        String taskId = req.getTaskId();
+        // 从taskId中或取出queryGraphql
+        String queryGraphql = "query($createNormalInvoice_id: ID){\n" +
+                "  normalInvoices(where: {_id: $createNormalInvoice_id} ) {\n" +
+                "    _id\n" +
+                "    company\n" +
+                "    comment\n" +
+                "  }\n" +
+                "}";
+        Map<String, Object> variables = (Map<String, Object>) graphqlService.queryGraphQL("data.graphql", queryGraphql,
+                NestObjectParser.parseGraphqlVariables(taskService.getVariables(taskId), queryGraphql));
+        return ResponseData.success(variables);
     }
 
 }

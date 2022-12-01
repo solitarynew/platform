@@ -78,6 +78,7 @@ public class GraphqlService {
 //        logger.log(org.apache.logging.log4j.Level.INFO,
 //                "Cypher query: " + translator.translate(query));
 //                "Cypher query: " + translator.translate(query));
+
         return graphQL
                 .execute(ExecutionInput.newExecutionInput()
                         .query(query)
