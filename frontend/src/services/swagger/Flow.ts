@@ -55,6 +55,21 @@ export async function formInfoUsingPOST(
   });
 }
 
+/** formQuery POST /api/flow/form/query */
+export async function formQueryUsingPOST(
+  body: API.FlowTaskFormQueryRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.ResponseDataMapstringobject>('/api/flow/form/query', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** Flow Picture By TaskId POST /api/flow/pic */
 export async function showPicByTaskIdUsingPOST(
   body: API.FlowPicByTaskId,

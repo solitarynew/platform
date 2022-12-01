@@ -49,14 +49,17 @@ declare namespace API {
     taskId?: string;
   };
 
+  type FlowTaskFormQueryRequest = {
+    taskId?: string;
+  };
+
   type FlowTaskFormRequest = {
     taskId?: string;
   };
 
   type FlowTaskFormResponse = {
-    formSchema?: string;
-    mutationGraphql?: string;
-    queryGraphql?: string;
+    mutationSchema?: string;
+    querySchema?: string;
   };
 
   type FlowTaskFormSaveRequest = {
