@@ -14,6 +14,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -28,8 +29,13 @@ public class GraphqlService {
     @javax.annotation.Resource
     private DataFetchingInterceptor dataFetchingInterceptor;
 
-    HashMap<String, GraphQL> graphQLMap = new HashMap<>();
+    public HashMap<String, GraphQL> graphQLMap = new HashMap<>();
     HashMap<String, Translator> translatorMap = new HashMap<>();
+
+    @PostConstruct
+    void init() throws IOException {
+        makeGraphQL(new ClassPathResource("data.graphql"));
+    }
 
     public GraphQL makeGraphQL(Resource resource) throws IOException {
 
