@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.*;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.image.ProcessDiagramGenerator;
@@ -27,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +60,30 @@ public class FlowController {
         return repositoryService.createDeployment()
                 .addClasspathResource("Invoice.bpmn20.xml")
                 .deploy();
+    }
+
+    @ApiOperation(value = "Flow Deployment List")
+    @RequestMapping(value = "/deployment", method = RequestMethod.POST)
+    public ResponseData<List<FlowProcessDefinitionRespVO>> FlowDeploymentList() {
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+        Map<String, FlowProcessDefinitionRespVO> flowProcessDefinitionRespVOMap = new HashMap<>();
+        for (ProcessDefinition processDefinition : processDefinitions) {
+            FlowProcessDefinitionRespVO flowProcessDefinitionRespVO = new FlowProcessDefinitionRespVO();
+            flowProcessDefinitionRespVO.setId(processDefinition.getId());
+            flowProcessDefinitionRespVO.setName(processDefinition.getName());
+            flowProcessDefinitionRespVO.setDescription(processDefinition.getDescription());
+            flowProcessDefinitionRespVO.setKey(processDefinition.getKey());
+            flowProcessDefinitionRespVO.setVersion(processDefinition.getVersion());
+            if (flowProcessDefinitionRespVOMap.containsKey(flowProcessDefinitionRespVO.getKey())) {
+                FlowProcessDefinitionRespVO previous = flowProcessDefinitionRespVOMap.get(flowProcessDefinitionRespVO.getKey());
+                if (previous.getVersion() < flowProcessDefinitionRespVO.getVersion()) {
+                    flowProcessDefinitionRespVOMap.put(flowProcessDefinitionRespVO.getKey(), flowProcessDefinitionRespVO);
+                }
+            } else {
+                flowProcessDefinitionRespVOMap.put(flowProcessDefinitionRespVO.getKey(), flowProcessDefinitionRespVO);
+            }
+        }
+        return ResponseData.success(new ArrayList<>(flowProcessDefinitionRespVOMap.values()));
     }
 
     @ApiOperation(value = "Flow Picture By TaskId")

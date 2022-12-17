@@ -3,6 +3,7 @@ package info.platform.controller;
 import graphql.GraphQL;
 import graphql.schema.GraphQLNamedType;
 import info.platform.common.result.ResponseData;
+import info.platform.controller.vo.GraphqlTypeRespVO;
 import info.platform.origin.GraphqlService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,10 +29,14 @@ public class GraphqlTypeController {
 
     @ApiOperation("Graphql Type")
     @RequestMapping(value = "/type", method = RequestMethod.POST)
-    public ResponseData<Void> queryGraphqlType() throws IOException {
+    public ResponseData<Object> queryGraphqlType() throws IOException {
         GraphQL graphQL = graphqlService.graphQLMap.get("data.graphql");
         List<GraphQLNamedType> typesAsList = graphQL.getGraphQLSchema().getAllTypesAsList();
-        return ResponseData.success();
+        for (GraphQLNamedType type : typesAsList) {
+            GraphqlTypeRespVO typeRespVO = new GraphqlTypeRespVO();
+            typeRespVO.setName(type.getName());
+        }
+        return ResponseData.success(null);
     }
 
 }
