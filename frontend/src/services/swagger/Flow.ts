@@ -25,6 +25,14 @@ export async function deployUsingPOST(options?: { [key: string]: any }) {
   });
 }
 
+/** Flow Deployment List POST /api/flow/deployment */
+export async function FlowDeploymentListUsingPOST(options?: { [key: string]: any }) {
+  return request<API.ResponseDataListFlowDeploymentResponse>('/api/flow/deployment', {
+    method: 'POST',
+    ...(options || {}),
+  });
+}
+
 /** form POST /api/flow/form */
 export async function formUsingPOST(
   body: API.FlowTaskFormRequest,

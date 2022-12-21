@@ -1,4 +1,9 @@
 declare namespace API {
+  type deletesUsingPOSTParams = {
+    /** Form ids */
+    ids: number;
+  };
+
   type Deployment = {
     category?: string;
     deploymentTime?: string;
@@ -18,6 +23,14 @@ declare namespace API {
     deploymentId?: string;
     generated?: boolean;
     name?: string;
+  };
+
+  type FlowDeploymentResponse = {
+    description?: string;
+    id?: string;
+    key?: string;
+    name?: string;
+    version?: number;
   };
 
   type FlowPicByTaskId = {
@@ -67,6 +80,35 @@ declare namespace API {
     variables?: Record<string, any>;
   };
 
+  type FormDeleteRequestVO = {
+    id?: number;
+  };
+
+  type FormItemResponseVO = {
+    description?: string;
+    id?: number;
+    name?: string;
+    schema?: string;
+  };
+
+  type FormRequestVO = {
+    description?: string;
+    name?: string;
+    schema?: string;
+  };
+
+  type FormUpdateRequestVO = {
+    description?: string;
+    id?: number;
+    name?: string;
+    schema?: string;
+  };
+
+  type getUsingGETParams = {
+    /** Form id */
+    id: number;
+  };
+
   type ResponseDataArrayTaskPageResponse = {
     data?: TaskPageResponse[];
     errorCode?: number;
@@ -102,7 +144,35 @@ declare namespace API {
     success?: boolean;
   };
 
+  type ResponseDataFormItemResponseVO = {
+    data?: FormItemResponseVO;
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type ResponseDataListFlowDeploymentResponse = {
+    data?: FlowDeploymentResponse[];
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type ResponseDataListFormItemResponseVO = {
+    data?: FormItemResponseVO[];
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
   type ResponseDataMapstringobject = {
+    data?: Record<string, any>;
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type ResponseDataobject = {
     data?: Record<string, any>;
     errorCode?: number;
     errorMessage?: string;
