@@ -62,6 +62,13 @@
   }
   ,
   {
+    name: 'list.process-list',
+    icon: 'table',
+    path: '/process-list',
+    component: './ProcessList',
+  }
+  ,
+  {
     path: '/',
     redirect: '/welcome',
   },

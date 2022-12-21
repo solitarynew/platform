@@ -77,4 +77,13 @@ export default {
   'pages.formList.table.toolbar.newForm': '新建表单',
   'pages.formList.table.option.previewForm': '预览表单',
   'pages.formList.table.option.updateForm': '编辑表单',
+  'pages.processList.table.column.id': '流程编号',
+  'pages.processList.table.column.name': '流程名称',
+  'pages.processList.table.column.key': '流程标识',
+  'pages.processList.table.column.description': '流程描述',
+  'pages.processList.table.column.version': '流程版本',
+  'pages.processList.table.column.options': '操作',
+  'pages.processList.table.column.options.start': '发起流程',
+  'pages.processList.table.column.options.config': '配置' ,
+  'pages.processList.table.title': '流程列表'
 };

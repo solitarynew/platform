@@ -4,6 +4,10 @@ import info.platform.common.result.ResponseData;
 import info.platform.common.utils.BeanUtils;
 import info.platform.common.utils.NestObjectParser;
 import info.platform.controller.vo.*;
+import info.platform.model.dao.FormRepository;
+import info.platform.model.dao.ProcessFormRepository;
+import info.platform.model.entity.FormDO;
+import info.platform.model.entity.ProcessFormDO;
 import info.platform.origin.GraphqlService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,6 +58,12 @@ public class FlowController {
 
     @Resource
     private GraphqlService graphqlService;
+
+    @Resource
+    private ProcessFormRepository processFormRepository;
+
+    @Resource
+    private FormRepository formRepository;
 
     @RequestMapping(value = "/deploy", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public Deployment deploy() {
@@ -159,8 +169,8 @@ public class FlowController {
     @RequestMapping(value = "complete", method = RequestMethod.POST)
     public ResponseData<Boolean> complete(@RequestBody FlowTaskCompleteReqVO req) {
         try {
-            String mutationQuery = "mutation($commment: String, $company: String) {\n" +
-                    "  createNormalInvoice(comment: $commment, company: $company) {\n" +
+            String mutationQuery = "mutation($comment: String, $company: String) {\n" +
+                    "  createNormalInvoice(comment: $comment, company: $company) {\n" +
                     "    id: _id\n" +
                     "  }\n" +
                     "}\n";
@@ -178,10 +188,22 @@ public class FlowController {
     @RequestMapping(value = "/form", method = RequestMethod.POST)
     public ResponseData<FlowTaskFormRespVO> form(@RequestBody FlowTaskFormReqVO req) {
         String taskId = req.getTaskId();
-        String TaskDefinitionKey = taskService.createTaskQuery().taskId(taskId).singleResult().getTaskDefinitionKey();
         FlowTaskFormRespVO vo = new FlowTaskFormRespVO();
-        vo.setQuerySchema("[{\"title\":\"备注\",\"dataIndex\":\"comment\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}},{\"title\":\"公司\",\"dataIndex\":\"company\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}}]");
-        vo.setMutationSchema("[{\"title\":\"备注\",\"dataIndex\":\"comment\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}},{\"title\":\"公司\",\"dataIndex\":\"company\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}}]");
+//        vo.setQuerySchema("[{\"title\":\"备注\",\"dataIndex\":\"comment\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}},{\"title\":\"公司\",\"dataIndex\":\"company\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}}]");
+//        vo.setMutationSchema("[{\"title\":\"备注\",\"dataIndex\":\"comment\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}},{\"title\":\"公司\",\"dataIndex\":\"company\",\"formItemProps\":{\"rules\":[{\"required\":true,\"message\":\"此项为必填项\"}]},\"width\":\"md\",\"colProps\":{\"xs\":24,\"md\":12}}]");
+        String taskDefinitionId = taskService.createTaskQuery().taskId(taskId).singleResult().getTaskDefinitionKey();
+        String processDefinitionId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessDefinitionId();
+        ProcessFormDO processFormDO = processFormRepository.findByProcessIdAndTaskId(processDefinitionId, taskDefinitionId);
+        if (processFormDO != null) {
+            FormDO queryFormDO = formRepository.findById(processFormDO.getQueryFormId()).orElse(null);
+            FormDO mutationFormDO = formRepository.findById(processFormDO.getMutationFormId()).orElse(null);
+            if (queryFormDO != null) {
+                vo.setQuerySchema(queryFormDO.getSchema());
+            }
+            if (mutationFormDO != null) {
+                vo.setMutationSchema(mutationFormDO.getSchema());
+            }
+        }
         return ResponseData.success(vo);
     }
 

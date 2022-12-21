@@ -26,6 +26,7 @@ export default {
   'menu.list.table-list': '查询表格',
   'menu.list.task-list': '任务列表',
   'menu.list.form-list': '表单列表',
+  'menu.list.process-list': '流程列表',
   'menu.list.basic-list': '标准列表',
   'menu.list.card-list': '卡片列表',
   'menu.list.search-list': '搜索列表',

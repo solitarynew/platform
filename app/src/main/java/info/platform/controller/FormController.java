@@ -61,5 +61,17 @@ public class FormController {
         return ResponseData.success(true);
     }
 
+    @ApiOperation(value = "Forms delete", notes = "Forms delete")
+    @ApiImplicitParam(name = "ids", value = "Form ids", required = true, dataType = "List")
+    @RequestMapping(value = "/deletes", method = RequestMethod.POST)
+    public ResponseData<Boolean> deletes(@RequestParam("ids") List<Integer> ids) {
+        try {
+            formRepository.deleteAllById(ids);
+        } catch (Exception e) {
+            return ResponseData.error(e.getMessage());
+        }
+        return ResponseData.success(true);
+    }
+
 
 }

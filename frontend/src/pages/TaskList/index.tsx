@@ -18,7 +18,7 @@ import {
   completeUsingPOST,
   formUsingPOST,
   saveUsingPOST,
-  formInfoUsingPOST
+  formInfoUsingPOST, formQueryUsingPOST
 } from "@/services/swagger/Flow"
 import {ExclamationCircleFilled} from "@ant-design/icons";
 import confirm from "antd/es/modal/confirm";
@@ -52,8 +52,8 @@ const getPicByTaskId = async (fields: API.TaskPageResponse) => {
 const getFormByTaskId = async (fields: API.TaskPageResponse) => {
   try {
     const resp: API.ResponseDataFlowTaskFormResponse = await formUsingPOST({"taskId": fields.id});
-    console.log(resp.data?.formSchema);
-    return resp.data?.formSchema;
+    console.log(resp.data?.querySchema);
+    return resp.data;
   } catch (error) {
     message.error('Failed to get the form of the flow instance');
     return "";
@@ -94,7 +94,8 @@ const TaskList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.TaskPageResponse>();
   const [currentPic, setCurrentPic] = useState<string>("");
-  const [currentForm, setCurrentForm] = useState<string>("{}");
+  const [currentMutationForm, setCurrentMutationForm] = useState<string>("{}");
+  const [currentQueryForm, setCurrentQueryForm] = useState<string>("{}");
 
   const columns: ProColumns<API.TaskPageResponse>[] = [
     {
@@ -113,7 +114,10 @@ const TaskList: React.FC = () => {
               await setCurrentRow(entity);
               await setShowDetail(true);
               setCurrentPic(await getPicByTaskId(entity) || "");
-              setCurrentForm(await getFormByTaskId(entity) || "{}");
+              const form = await getFormByTaskId(entity);
+              await setCurrentQueryForm(form == "" ? "{}" : form?.querySchema || "{}");
+              await setCurrentMutationForm(form == "" ? "{}" : form?.mutationSchema || "{}");
+
             }}
           >
             {dom}
@@ -156,11 +160,11 @@ const TaskList: React.FC = () => {
           setCurrentRow(undefined);
           setShowDetail(false);
           setCurrentPic("");
-          setCurrentForm("{}");
+          setCurrentMutationForm("{}");
         }}
         closable={false}
       >
-        {currentRow?.name && currentForm!= "{}" && (
+        {currentRow?.name && currentMutationForm!= "{}" && (
           <><ProDescriptions<API.TaskListItem>
             column={2}
             title={currentRow?.name}
@@ -173,6 +177,36 @@ const TaskList: React.FC = () => {
             columns={columns as ProDescriptionsItemProps<API.TaskListItem>[]}/>
             <Divider/>
             <Image src={"data:image/png;base64," + currentPic}/>
+            <Divider/>
+            <BetaSchemaForm<DataItem>
+              layoutType={'Form'}
+              steps={[
+                {
+                  title: 'ProComponent',
+                },
+              ]}
+              rowProps={{
+                gutter: [16, 16],
+              }}
+              colProps={{
+                span: 12,
+              }}
+              params={{taskId: currentRow?.id}}
+              request={async () => {const resp = await formQueryUsingPOST({taskId: currentRow?.id});
+                console.log(resp);
+                return resp.data || {};}}
+              grid={true}
+              // 将currentQueryForm转换为json，并且在数组的每一项中插入readonly属性
+              columns={JSON.parse(currentQueryForm).map((item: any) => {
+                item.readonly = true;
+                return item;
+              })}
+              submitter={{
+                render: () => {
+                  return [];
+                }
+              }}
+            />
             <Divider/>
             <BetaSchemaForm<DataItem>
             trigger={<a>填写表单</a>}
@@ -201,7 +235,7 @@ const TaskList: React.FC = () => {
                 return false;
               }
             }}
-            columns={JSON.parse(currentForm)}/>
+            columns={JSON.parse(currentMutationForm)}/>
             <Divider/>
             <Row>
               <Col span={12}>
