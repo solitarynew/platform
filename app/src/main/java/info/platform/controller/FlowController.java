@@ -6,7 +6,6 @@ import info.platform.common.utils.NestObjectParser;
 import info.platform.controller.vo.*;
 import info.platform.model.dao.FormRepository;
 import info.platform.model.dao.ProcessFormRepository;
-import info.platform.model.entity.FormDO;
 import info.platform.model.entity.ProcessFormDO;
 import info.platform.origin.GraphqlService;
 import io.swagger.annotations.Api;
@@ -169,18 +168,31 @@ public class FlowController {
     @RequestMapping(value = "complete", method = RequestMethod.POST)
     public ResponseData<Boolean> complete(@RequestBody FlowTaskCompleteReqVO req) {
         try {
-            String mutationQuery = "mutation($comment: String, $company: String) {\n" +
-                    "  createNormalInvoice(comment: $comment, company: $company) {\n" +
-                    "    id: _id\n" +
-                    "  }\n" +
-                    "}\n";
-            Map<String, Object> variables = taskService.getVariablesLocal(req.getTaskId());
-            Object o = graphqlService.queryGraphQL("data.graphql", mutationQuery, variables);
-            taskService.setVariables(req.getTaskId(), (Map<String, ? extends Object>) o);
-            taskService.complete(req.getTaskId(), req.getVariables());
+            //  必须为带下划线的字段重新命名
+//            String mutationQuery = "mutation($comment: String, $company: String) {\n" +
+//                    "  createNormalInvoice(comment: $comment, company: $company) {\n" +
+//                    "    id: _id\n" +
+//                    "  }\n" +
+//                    "}\n";
+            String taskId = req.getTaskId();
+            Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            String taskDefinitionId = task.getTaskDefinitionKey();
+            String processDefinitionId = task.getProcessDefinitionId();
+            ProcessFormDO processFormDO = processFormRepository.findByProcessIdAndTaskId(processDefinitionId, taskDefinitionId);
+            if (processFormDO != null && processFormDO.getMutationGraphql() != null) {
+                String mutationQuery = processFormDO.getMutationGraphql();
+                Map<String, Object> variables = taskService.getVariablesLocal(req.getTaskId());
+                Object o = graphqlService.queryGraphQL("data.graphql", mutationQuery, variables);
+                runtimeService.setVariables(task.getProcessInstanceId(), (Map<String, ? extends Object>) o);
+                //taskService.setVariables(req.getTaskId(), (Map<String, ? extends Object>) o);
+                taskService.complete(req.getTaskId(), req.getVariables());
+            } else {
+                taskService.complete(req.getTaskId(), taskService.getVariablesLocal(taskId));
+            }
             return ResponseData.success(true);
         } catch (Exception e) {
-            return ResponseData.error(e.getMessage());
+            throw new RuntimeException(e);
+            //return ResponseData.error(e.getMessage());
         }
 
     }
@@ -194,16 +206,12 @@ public class FlowController {
         String taskDefinitionId = taskService.createTaskQuery().taskId(taskId).singleResult().getTaskDefinitionKey();
         String processDefinitionId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessDefinitionId();
         ProcessFormDO processFormDO = processFormRepository.findByProcessIdAndTaskId(processDefinitionId, taskDefinitionId);
-        if (processFormDO != null) {
-            FormDO queryFormDO = formRepository.findById(processFormDO.getQueryFormId()).orElse(null);
-            FormDO mutationFormDO = formRepository.findById(processFormDO.getMutationFormId()).orElse(null);
-            if (queryFormDO != null) {
-                vo.setQuerySchema(queryFormDO.getSchema());
-            }
-            if (mutationFormDO != null) {
-                vo.setMutationSchema(mutationFormDO.getSchema());
-            }
-        }
+        formRepository.findById(processFormDO.getQueryFormId()).ifPresent(formDO -> {
+            vo.setQuerySchema(formDO.getSchema());
+        });
+        formRepository.findById(processFormDO.getMutationFormId()).ifPresent(formDO -> {
+            vo.setMutationSchema(formDO.getSchema());
+        });
         return ResponseData.success(vo);
     }
 
@@ -224,13 +232,17 @@ public class FlowController {
     public ResponseData<Map<String, Object>> formQuery(@RequestBody FlowTaskFormQueryReqVO req) throws OptimizedQueryException, IOException {
         String taskId = req.getTaskId();
         // 从taskId中或取出queryGraphql
-        String queryGraphql = "query($createNormalInvoice_id: ID){\n" +
-                "  normalInvoices(where: {_id: $createNormalInvoice_id} ) {\n" +
-                "    _id\n" +
-                "    company\n" +
-                "    comment\n" +
-                "  }\n" +
-                "}";
+//        String queryGraphql = "query($createNormalInvoice_id: ID){\n" +
+//                "  normalInvoices(where: {_id: $createNormalInvoice_id} ) {\n" +
+//                "    _id\n" +
+//                "    company\n" +
+//                "    comment\n" +
+//                "  }\n" +
+//                "}";
+        String taskDefinitionId = taskService.createTaskQuery().taskId(taskId).singleResult().getTaskDefinitionKey();
+        String processDefinitionId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessDefinitionId();
+        ProcessFormDO processFormDO = processFormRepository.findByProcessIdAndTaskId(processDefinitionId, taskDefinitionId);
+        String queryGraphql = processFormDO.getQueryGraphql();
         Map<String, Object> variables = (Map<String, Object>) graphqlService.queryGraphQL("data.graphql", queryGraphql,
                 NestObjectParser.parseGraphqlVariables(taskService.getVariables(taskId), queryGraphql));
         return ResponseData.success(variables);

@@ -36,7 +36,7 @@
       <bpmn2:outgoing>Flow_0rcl0dh</bpmn2:outgoing>
     </bpmn2:userTask>
     <bpmn2:sequenceFlow id="Flow_1exehac" name="流程线" sourceRef="Gateway_1wpvrdz" targetRef="Activity_1t49tkr">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">check=="通过"</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == "通过"}</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:exclusiveGateway id="Gateway_0bsu00g" name="互斥网关">
       <bpmn2:incoming>Flow_0rcl0dh</bpmn2:incoming>
@@ -52,13 +52,13 @@
       <bpmn2:incoming>Flow_14napzn</bpmn2:incoming>
     </bpmn2:endEvent>
     <bpmn2:sequenceFlow id="Flow_14napzn" name="流程线" sourceRef="Gateway_0bsu00g" targetRef="Event_1goit9f">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">check=="通过"</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == "通过"}</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:sequenceFlow id="Flow_09o0412" name="流程线" sourceRef="Gateway_1wpvrdz" targetRef="Event_0izl9an">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">check=="拒绝"</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == "拒绝"}</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:sequenceFlow id="Flow_0da6q8j" name="流程线" sourceRef="Gateway_0bsu00g" targetRef="Event_0izl9an">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">check=="拒绝"</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == "拒绝"}</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

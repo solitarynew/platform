@@ -23,4 +23,10 @@ public class ProcessFormDO {
 
     @Column(name = "mutation_form_id")
     private Integer mutationFormId;
+
+    @Column(name = "query_graphql")
+    private String queryGraphql;
+
+    @Column(name = "mutation_graphql")
+    private String mutationGraphql;
 }

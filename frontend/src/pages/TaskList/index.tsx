@@ -149,7 +149,7 @@ const TaskList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        params={{assignee: "1", current: 1, pageSize: 20}}
+        params={{assignee: "2", current: 1, pageSize: 100}}
         request={tasksUsingPOST}
         columns={columns}
       />
@@ -177,8 +177,9 @@ const TaskList: React.FC = () => {
             columns={columns as ProDescriptionsItemProps<API.TaskListItem>[]}/>
             <Divider/>
             <Image src={"data:image/png;base64," + currentPic}/>
-            <Divider/>
-            <BetaSchemaForm<DataItem>
+            {currentQueryForm != "{}" && currentQueryForm != "[]"&& (<>
+              <Divider/>
+              <BetaSchemaForm<DataItem>
               layoutType={'Form'}
               steps={[
                 {
@@ -192,9 +193,11 @@ const TaskList: React.FC = () => {
                 span: 12,
               }}
               params={{taskId: currentRow?.id}}
-              request={async () => {const resp = await formQueryUsingPOST({taskId: currentRow?.id});
+              request={async () => {
+                const resp = await formQueryUsingPOST({taskId: currentRow?.id});
                 console.log(resp);
-                return resp.data || {};}}
+                return resp.data || {};
+              }}
               grid={true}
               // 将currentQueryForm转换为json，并且在数组的每一项中插入readonly属性
               columns={JSON.parse(currentQueryForm).map((item: any) => {
@@ -205,8 +208,8 @@ const TaskList: React.FC = () => {
                 render: () => {
                   return [];
                 }
-              }}
-            />
+              }}/>
+            </>)}
             <Divider/>
             <BetaSchemaForm<DataItem>
             trigger={<a>填写表单</a>}
