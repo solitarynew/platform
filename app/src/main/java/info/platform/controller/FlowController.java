@@ -4,6 +4,7 @@ import info.platform.common.result.ResponseData;
 import info.platform.common.utils.BeanUtils;
 import info.platform.common.utils.NestObjectParser;
 import info.platform.controller.vo.*;
+import info.platform.convert.ProcessFormConvert;
 import info.platform.model.dao.FormRepository;
 import info.platform.model.dao.ProcessFormRepository;
 import info.platform.model.entity.ProcessFormDO;
@@ -83,6 +84,13 @@ public class FlowController {
             flowProcessDefinitionRespVO.setDescription(processDefinition.getDescription());
             flowProcessDefinitionRespVO.setKey(processDefinition.getKey());
             flowProcessDefinitionRespVO.setVersion(processDefinition.getVersion());
+            // 获取这个processDefinition的所有taskDefinitionKey
+            BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
+            List<String> taskDefinitionKeys = new ArrayList<>();
+            bpmnModel.getMainProcess().findFlowElementsOfType(org.flowable.bpmn.model.UserTask.class).forEach(userTask -> {
+                taskDefinitionKeys.add(userTask.getId());
+            });
+            flowProcessDefinitionRespVO.setTaskDefinitionKeys(taskDefinitionKeys);
             if (flowProcessDefinitionRespVOMap.containsKey(flowProcessDefinitionRespVO.getKey())) {
                 FlowProcessDefinitionRespVO previous = flowProcessDefinitionRespVOMap.get(flowProcessDefinitionRespVO.getKey());
                 if (previous.getVersion() < flowProcessDefinitionRespVO.getVersion()) {
@@ -248,4 +256,10 @@ public class FlowController {
         return ResponseData.success(variables);
     }
 
+    @RequestMapping(value = "/processForm", method = RequestMethod.GET)
+    public ResponseData<List<ProcessFormItemRespVO>> processForm(@RequestBody ProcessFormReqVO req) {
+        String processId = req.getProcessId();
+        List<ProcessFormDO> processFormDOList = processFormRepository.findByProcessId(processId);
+        return ResponseData.success(ProcessFormConvert.INSTANCE.convertList(processFormDOList));
+    }
 }

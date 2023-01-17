@@ -30,6 +30,7 @@ declare namespace API {
     id?: string;
     key?: string;
     name?: string;
+    taskDefinitionKeys?: string[];
     version?: number;
   };
 

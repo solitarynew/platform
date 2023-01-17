@@ -1,16 +1,98 @@
 import React, {useRef, useState} from "react";
 import {FormattedMessage, useIntl} from "@@/plugin-locale/localeExports";
-import {ActionType, PageContainer, ProColumns, ProTable} from "@ant-design/pro-components";
+import {ActionType, BetaSchemaForm, PageContainer, ProColumns, ProTable} from "@ant-design/pro-components";
 import confirm from "antd/es/modal/confirm";
 import {ExclamationCircleFilled} from "@ant-design/icons";
 import {startUsingPOST} from "@/services/swagger/Flow";
 import {FlowDeploymentListUsingPOST} from "@/services/swagger/Flow";
+import {listUsingGET} from "@/services/swagger/Form";
+
+let valueEnum = {
+};
+
+function generateSchemaByTask(taskDefinitionKeys: string[]) {
+  // return [
+  //   {
+  //     title: "任务1",
+  //     valueType: "group",
+  //     columns: [
+  //       {
+  //         title: "查询表单",
+  //         dataIndex: ["task1", "queryFormId"],
+  //         valueType: "select",
+  //         width: "md",
+  //         valueEnum: valueEnum,
+  //       },
+  //       {
+  //         title: "查询语句",
+  //         dataIndex: ["task1", "queryGraphql"],
+  //         valueType: "text",
+  //         width: "md",
+  //       },
+  //       {
+  //         title: "执行表单",
+  //         dataIndex: ["task1", "mutationFormId"],
+  //         valueType: "select",
+  //         width: "md",
+  //         valueEnum: valueEnum,
+  //       },
+  //       {
+  //         title: "执行语句",
+  //         dataIndex: ["task1", "mutationGraphql"],
+  //         valueType: "text",
+  //         width: "md",
+  //       }
+  //     ]
+  //   }
+  // ]
+  // 根据taskDefinitionKeys生产schema
+  const schema: { title: string; valueType: string; columns: ({ title: string; dataIndex: string[]; valueType: string; width: string; valueEnum: {}; } | { title: string; dataIndex: string[]; valueType: string; width: string; valueEnum?: undefined; })[]; }[] = [];
+  taskDefinitionKeys.forEach((taskDefinitionKey) => {
+    schema.push({
+      title: taskDefinitionKey,
+      valueType: "group",
+      columns: [
+        {
+          title: "查询表单",
+          dataIndex: [taskDefinitionKey, "queryFormId"],
+          valueType: "select",
+          width: "md",
+          valueEnum: valueEnum,
+        },
+        {
+          title: "查询语句",
+          dataIndex: [taskDefinitionKey, "queryGraphql"],
+          valueType: "text",
+          width: "md",
+        },
+        {
+          title: "执行表单",
+          dataIndex: [taskDefinitionKey, "mutationFormId"],
+          valueType: "select",
+          width: "md",
+          valueEnum: valueEnum,
+        },
+        {
+          title: "执行语句",
+          dataIndex: [taskDefinitionKey, "mutationGraphql"],
+          valueType: "text",
+          width: "md",
+        }
+      ]
+    })
+  })
+
+  return schema;
+
+}
+
 
 const FormList: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.FlowDeploymentResponse>();
   const [configVisible, setConfigVisible] = useState<boolean>(false);
+  const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
 
   /**
    * @en-US International configuration
@@ -83,6 +165,7 @@ const FormList: React.FC = () => {
           onClick={() => {
             setCurrentRow(record);
             setConfigVisible(true);
+            setConfigModalVisible(true);
           }
           }
         >
@@ -105,9 +188,38 @@ const FormList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => []}
-        request={FlowDeploymentListUsingPOST}
+        request={async () => {
+          const formList = await listUsingGET();
+          // formList变为一个字典，key为id，value为也为一个字典，text字段为name
+          valueEnum = formList.data?.reduce((acc, cur) => {
+            if (cur.id) {
+              acc[cur.id] = cur.name;
+            }
+            return acc;
+          }, {}) || {};
+          const result = await FlowDeploymentListUsingPOST();
+          console.log(result);
+          return result;
+        }}
         columns={columns}
       />
+      {configModalVisible && (<BetaSchemaForm
+        layoutType="ModalForm"
+        title={intl.formatMessage({
+            id: 'pages.processList.table.option.configForm',
+            defaultMessage: 'Config Form',
+          }
+        )}
+        visible={configModalVisible}
+        width={800}
+        onVisibleChange={setConfigModalVisible}
+        columns={generateSchemaByTask(currentRow?.taskDefinitionKeys || [])}
+        onFinish={async (values) => {
+          console.log(values as {});
+          setConfigModalVisible(false);
+        }}
+        >
+      </BetaSchemaForm>)}
     </PageContainer>
   );
 };

@@ -85,5 +85,6 @@ export default {
   'pages.processList.table.column.options': '操作',
   'pages.processList.table.column.options.start': '发起流程',
   'pages.processList.table.column.options.config': '配置' ,
-  'pages.processList.table.title': '流程列表'
+  'pages.processList.table.title': '流程列表',
+  'pages.processList.table.option.configForm': '配置表单'
 };
