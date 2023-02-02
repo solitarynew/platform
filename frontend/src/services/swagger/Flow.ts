@@ -93,6 +93,36 @@ export async function showPicByTaskIdUsingPOST(
   });
 }
 
+/** processForm POST /api/flow/processForm */
+export async function processFormUsingPOST(
+  body: API.ProcessFormRequestVO,
+  options?: { [key: string]: any },
+) {
+  return request<API.ResponseDataMapstringProcessFormResponseVO>('/api/flow/processForm', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** processFormSave POST /api/flow/processForm/save */
+export async function processFormSaveUsingPOST(
+  body: API.ProcessFormSaveRequestVO,
+  options?: { [key: string]: any },
+) {
+  return request<API.ResponseDataboolean>('/api/flow/processForm/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** save POST /api/flow/save */
 export async function saveUsingPOST(
   body: API.FlowTaskFormSaveRequest,

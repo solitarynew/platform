@@ -110,6 +110,30 @@ declare namespace API {
     id: number;
   };
 
+  type ProcessFormItem = {
+    mutationFormId?: number;
+    mutationGraphql?: string;
+    queryFormId?: number;
+    queryGraphql?: string;
+  };
+
+  type ProcessFormRequestVO = {
+    processId?: string;
+  };
+
+  type ProcessFormResponseVO = {
+    mutationFormId?: number;
+    mutationGraphql?: string;
+    queryFormId?: number;
+    queryGraphql?: string;
+    taskId?: string;
+  };
+
+  type ProcessFormSaveRequestVO = {
+    items?: Record<string, any>;
+    processId?: string;
+  };
+
   type ResponseDataArrayTaskPageResponse = {
     data?: TaskPageResponse[];
     errorCode?: number;
@@ -167,6 +191,13 @@ declare namespace API {
   };
 
   type ResponseDataMapstringobject = {
+    data?: Record<string, any>;
+    errorCode?: number;
+    errorMessage?: string;
+    success?: boolean;
+  };
+
+  type ResponseDataMapstringProcessFormResponseVO = {
     data?: Record<string, any>;
     errorCode?: number;
     errorMessage?: string;

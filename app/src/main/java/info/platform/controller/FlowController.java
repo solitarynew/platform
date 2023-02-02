@@ -11,6 +11,7 @@ import info.platform.model.entity.ProcessFormDO;
 import info.platform.origin.GraphqlService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import liquibase.pro.packaged.M;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.*;
 import org.flowable.engine.repository.Deployment;
@@ -256,10 +257,29 @@ public class FlowController {
         return ResponseData.success(variables);
     }
 
-    @RequestMapping(value = "/processForm", method = RequestMethod.GET)
-    public ResponseData<List<ProcessFormItemRespVO>> processForm(@RequestBody ProcessFormReqVO req) {
+    @RequestMapping(value = "/processForm", method = RequestMethod.POST)
+    public ResponseData<Map<String, ProcessFormItemRespVO>> processForm(@RequestBody ProcessFormReqVO req) {
         String processId = req.getProcessId();
         List<ProcessFormDO> processFormDOList = processFormRepository.findByProcessId(processId);
-        return ResponseData.success(ProcessFormConvert.INSTANCE.convertList(processFormDOList));
+        List<ProcessFormItemRespVO> processFormItemRespVOList = ProcessFormConvert.INSTANCE.convertList(processFormDOList);
+        Map<String, ProcessFormItemRespVO> processFormItemRespVOMap = new HashMap<>();
+        processFormItemRespVOList.forEach(processFormItemRespVO -> {
+            processFormItemRespVOMap.put(processFormItemRespVO.getTaskId(), processFormItemRespVO);
+        });
+        return ResponseData.success(processFormItemRespVOMap);
     }
+
+    @RequestMapping(value = "/processForm/save", method = RequestMethod.POST)
+    public ResponseData<Boolean> processFormSave(@RequestBody ProcessFormSaveReqVO req) {
+        req.getItems().forEach((k, v) -> {
+            ProcessFormDO processFormDO = processFormRepository.findByProcessIdAndTaskId(req.getProcessId(), k);
+            processFormDO.setQueryFormId(v.getQueryFormId());
+            processFormDO.setMutationFormId(v.getMutationFormId());
+            processFormDO.setQueryGraphql(v.getQueryGraphql());
+            processFormDO.setMutationGraphql(v.getMutationGraphql());
+            processFormRepository.save(processFormDO);
+        });
+        return ResponseData.success(true);
+    }
+
 }

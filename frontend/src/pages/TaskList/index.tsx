@@ -149,7 +149,7 @@ const TaskList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        params={{assignee: "3", current: 1, pageSize: 100}}
+        params={{assignee: "1", current: 1, pageSize: 100}}
         request={tasksUsingPOST}
         columns={columns}
       />

@@ -4,7 +4,7 @@ import {ActionType, BetaSchemaForm, PageContainer, ProColumns, ProTable} from "@
 import confirm from "antd/es/modal/confirm";
 import {ExclamationCircleFilled} from "@ant-design/icons";
 import {startUsingPOST} from "@/services/swagger/Flow";
-import {FlowDeploymentListUsingPOST} from "@/services/swagger/Flow";
+import {FlowDeploymentListUsingPOST, processFormUsingPOST, processFormSaveUsingPOST} from "@/services/swagger/Flow";
 import {listUsingGET} from "@/services/swagger/Form";
 
 let valueEnum = {
@@ -46,7 +46,7 @@ function generateSchemaByTask(taskDefinitionKeys: string[]) {
   //   }
   // ]
   // 根据taskDefinitionKeys生产schema
-  const schema: { title: string; valueType: string; columns: ({ title: string; dataIndex: string[]; valueType: string; width: string; valueEnum: {}; } | { title: string; dataIndex: string[]; valueType: string; width: string; valueEnum?: undefined; })[]; }[] = [];
+  const schema = [];
   taskDefinitionKeys.forEach((taskDefinitionKey) => {
     schema.push({
       title: taskDefinitionKey,
@@ -57,12 +57,16 @@ function generateSchemaByTask(taskDefinitionKeys: string[]) {
           dataIndex: [taskDefinitionKey, "queryFormId"],
           valueType: "select",
           width: "md",
+          // 这里必须有个这个不知道为什么，value明明已经转化过了，并且这一句也滨海港没有执行
+          convertValue: (value: number) => {
+            console.log(value)
+            value.toString()},
           valueEnum: valueEnum,
         },
         {
           title: "查询语句",
           dataIndex: [taskDefinitionKey, "queryGraphql"],
-          valueType: "text",
+          valueType: "textarea",
           width: "md",
         },
         {
@@ -70,12 +74,13 @@ function generateSchemaByTask(taskDefinitionKeys: string[]) {
           dataIndex: [taskDefinitionKey, "mutationFormId"],
           valueType: "select",
           width: "md",
+          convertValue: (value: number) => {value.toString()},
           valueEnum: valueEnum,
         },
         {
           title: "执行语句",
           dataIndex: [taskDefinitionKey, "mutationGraphql"],
-          valueType: "text",
+          valueType: "textarea",
           width: "md",
         }
       ]
@@ -91,7 +96,6 @@ const FormList: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.FlowDeploymentResponse>();
-  const [configVisible, setConfigVisible] = useState<boolean>(false);
   const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
 
   /**
@@ -164,7 +168,6 @@ const FormList: React.FC = () => {
           key="config"
           onClick={() => {
             setCurrentRow(record);
-            setConfigVisible(true);
             setConfigModalVisible(true);
           }
           }
@@ -197,6 +200,7 @@ const FormList: React.FC = () => {
             }
             return acc;
           }, {}) || {};
+          console.log(valueEnum)
           const result = await FlowDeploymentListUsingPOST();
           console.log(result);
           return result;
@@ -214,8 +218,22 @@ const FormList: React.FC = () => {
         width={800}
         onVisibleChange={setConfigModalVisible}
         columns={generateSchemaByTask(currentRow?.taskDefinitionKeys || [])}
+        request={async () => {
+          const result = await processFormUsingPOST({processId: currentRow?.id});
+          for (const key in result.data) {
+            result.data[key].queryFormId = result.data[key].queryFormId.toString();
+            result.data[key].mutationFormId = result.data[key].mutationFormId.toString();
+          }
+          console.log(result.data)
+          return result.data;
+        }}
         onFinish={async (values) => {
-          console.log(values as {});
+          for (const key in values) {
+            values[key].queryFormId = parseInt(values[key].queryFormId);
+            values[key].mutationFormId = parseInt(values[key].mutationFormId);
+          }
+          console.log(values)
+          await processFormSaveUsingPOST({processId: currentRow?.id, items: values});
           setConfigModalVisible(false);
         }}
         >
