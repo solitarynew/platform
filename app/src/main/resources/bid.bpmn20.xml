@@ -24,13 +24,13 @@
             <bpmn2:incoming>Flow_0ab7zyf</bpmn2:incoming>
         </bpmn2:intermediateThrowEvent>
         <bpmn2:sequenceFlow id="Flow_0ab7zyf" sourceRef="Gateway_16w8kkj" targetRef="Event_056tnh5">
-            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == True}</bpmn2:conditionExpression>
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == true}</bpmn2:conditionExpression>
         </bpmn2:sequenceFlow>
         <bpmn2:intermediateThrowEvent id="Event_0jex0vq">
             <bpmn2:incoming>Flow_0eowo5u</bpmn2:incoming>
         </bpmn2:intermediateThrowEvent>
         <bpmn2:sequenceFlow id="Flow_0eowo5u" sourceRef="Gateway_16w8kkj" targetRef="Event_0jex0vq">
-            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == False}</bpmn2:conditionExpression>
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == false}</bpmn2:conditionExpression>
         </bpmn2:sequenceFlow>
     </bpmn2:process>
     <bpmndi:BPMNDiagram id="BPMNDiagram_1">
