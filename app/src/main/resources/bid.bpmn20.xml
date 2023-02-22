@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:activiti="http://activiti.org/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="diagram_process_1667737476222" targetNamespace="http://activiti.org/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="createBidSecurity" name="创建投标保证金" isExecutable="true">
+        <bpmn2:startEvent id="Event_19tqmhx">
+            <bpmn2:outgoing>Flow_16gmox3</bpmn2:outgoing>
+        </bpmn2:startEvent>
+        <bpmn2:userTask id="input" name="填写投标保证金" activiti:formKey="" activiti:assignee="1">
+            <bpmn2:incoming>Flow_16gmox3</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_1so78zt</bpmn2:outgoing>
+        </bpmn2:userTask>
+        <bpmn2:sequenceFlow id="Flow_16gmox3" sourceRef="Event_19tqmhx" targetRef="input"/>
+        <bpmn2:userTask id="check" name="审核" activiti:assignee="2">
+            <bpmn2:incoming>Flow_1so78zt</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_0y61k0d</bpmn2:outgoing>
+        </bpmn2:userTask>
+        <bpmn2:sequenceFlow id="Flow_1so78zt" sourceRef="input" targetRef="check"/>
+        <bpmn2:exclusiveGateway id="Gateway_16w8kkj">
+            <bpmn2:incoming>Flow_0y61k0d</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_0ab7zyf</bpmn2:outgoing>
+            <bpmn2:outgoing>Flow_0eowo5u</bpmn2:outgoing>
+        </bpmn2:exclusiveGateway>
+        <bpmn2:sequenceFlow id="Flow_0y61k0d" sourceRef="check" targetRef="Gateway_16w8kkj"/>
+        <bpmn2:intermediateThrowEvent id="Event_056tnh5">
+            <bpmn2:incoming>Flow_0ab7zyf</bpmn2:incoming>
+        </bpmn2:intermediateThrowEvent>
+        <bpmn2:sequenceFlow id="Flow_0ab7zyf" sourceRef="Gateway_16w8kkj" targetRef="Event_056tnh5">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == True}</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:intermediateThrowEvent id="Event_0jex0vq">
+            <bpmn2:incoming>Flow_0eowo5u</bpmn2:incoming>
+        </bpmn2:intermediateThrowEvent>
+        <bpmn2:sequenceFlow id="Flow_0eowo5u" sourceRef="Gateway_16w8kkj" targetRef="Event_0jex0vq">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${check == False}</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="createBidSecurity">
+            <bpmndi:BPMNEdge id="Flow_16gmox3_di" bpmnElement="Flow_16gmox3">
+                <di:waypoint x="268" y="290"/>
+                <di:waypoint x="360" y="290"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1so78zt_di" bpmnElement="Flow_1so78zt">
+                <di:waypoint x="480" y="290"/>
+                <di:waypoint x="540" y="290"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0y61k0d_di" bpmnElement="Flow_0y61k0d">
+                <di:waypoint x="660" y="290"/>
+                <di:waypoint x="720" y="290"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0ab7zyf_di" bpmnElement="Flow_0ab7zyf">
+                <di:waypoint x="770" y="290"/>
+                <di:waypoint x="830" y="290"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0eowo5u_di" bpmnElement="Flow_0eowo5u">
+                <di:waypoint x="745" y="315"/>
+                <di:waypoint x="745" y="420"/>
+                <di:waypoint x="830" y="420"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="Event_19tqmhx_di" bpmnElement="Event_19tqmhx">
+                <dc:Bounds x="232" y="272" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0d14grk_di" bpmnElement="input">
+                <dc:Bounds x="360" y="230" width="120" height="120"/>
+                <bpmndi:BPMNLabel/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0ao4y9r_di" bpmnElement="check">
+                <dc:Bounds x="540" y="230" width="120" height="120"/>
+                <bpmndi:BPMNLabel/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Gateway_16w8kkj_di" bpmnElement="Gateway_16w8kkj" isMarkerVisible="true">
+                <dc:Bounds x="720" y="265" width="50" height="50"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Event_056tnh5_di" bpmnElement="Event_056tnh5">
+                <dc:Bounds x="830" y="272" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Event_0jex0vq_di" bpmnElement="Event_0jex0vq">
+                <dc:Bounds x="830" y="402" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -48,12 +48,12 @@ type BidSecurity {
     saler: String
     client: String
     projectName: String
-    expectWithdrawTime: _Neo4jDateTime
+    expectWithdrawTime: String
     payCompany: String
     receiveCompany: String
     money: Float
     comment: String
-    createAt: _Neo4jDateTime
+    createAt: String
     serialNumber: String
     dlt: Boolean
     month: String
