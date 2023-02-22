@@ -11,7 +11,6 @@ import info.platform.model.entity.ProcessFormDO;
 import info.platform.origin.GraphqlService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import liquibase.pro.packaged.M;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.*;
 import org.flowable.engine.repository.Deployment;
@@ -69,7 +68,7 @@ public class FlowController {
     @RequestMapping(value = "/deploy", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public Deployment deploy() {
         return repositoryService.createDeployment()
-                .addClasspathResource("Invoice.bpmn20.xml")
+                .addClasspathResource("bid.bpmn20.xml")
                 .deploy();
     }
 
@@ -273,6 +272,11 @@ public class FlowController {
     public ResponseData<Boolean> processFormSave(@RequestBody ProcessFormSaveReqVO req) {
         req.getItems().forEach((k, v) -> {
             ProcessFormDO processFormDO = processFormRepository.findByProcessIdAndTaskId(req.getProcessId(), k);
+            if (processFormDO == null) {
+                processFormDO = new ProcessFormDO();
+                processFormDO.setProcessId(req.getProcessId());
+                processFormDO.setTaskId(k);
+            }
             processFormDO.setQueryFormId(v.getQueryFormId());
             processFormDO.setMutationFormId(v.getMutationFormId());
             processFormDO.setQueryGraphql(v.getQueryGraphql());
